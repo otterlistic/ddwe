@@ -62,7 +62,7 @@ async function downloadProductImage(productId, imageId) {
 export async function downloadProductImages() {
   db.serialize(() => {
     db.all(
-      "SELECT product_id FROM products WHERE image_id IS NOT NULL",
+      "SELECT product_id FROM products WHERE image_id IS NOT NULL OFFSET 2415",
       async (err, rows) => {
         if (err) {
           console.error(
@@ -78,6 +78,7 @@ export async function downloadProductImages() {
           BATCH_COUNTER < productCount;
           BATCH_COUNTER += BATCH_LIMIT
         ) {
+          await sleep(5000);
           const productId = productIdList[BATCH_COUNTER];
           const res = await fetch(
             `https://fbpprod.fts.at/api/v1/sht/articles/${productId}`
@@ -103,7 +104,7 @@ export async function downloadProductImages() {
                   }
                 );
                 console.info(
-                  `[Info]: Saved ${JSON.stringify(
+                  `[Info:${Date.now()}]: Saved ${JSON.stringify(
                     imageIdList
                   )} image IDs of ${productId} to db`
                 );
@@ -121,7 +122,6 @@ export async function downloadProductImages() {
               );
             }
           }
-          await sleep(5000);
         }
       }
     );
