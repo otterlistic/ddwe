@@ -62,7 +62,7 @@ async function downloadProductImage(productId, imageId) {
 export async function downloadProductImages() {
   db.serialize(() => {
     db.all(
-      "SELECT product_id FROM products WHERE image_id IS NOT NULL LIMIT 3",
+      "SELECT product_id FROM products WHERE image_id IS NOT NULL",
       async (err, rows) => {
         if (err) {
           console.error(
