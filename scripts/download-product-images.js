@@ -29,12 +29,19 @@ async function makeProductDirectory(filePath) {
 }
 
 async function downloadProductImage(productId, imageId) {
+  const url = `https://fbpprod.fts.at/api/v1/sht/articles/${productId}/media/${imageId}`;
+  const filePath = `${productId}/${imageId}.jpg`;
   try {
-    const url = `https://fbpprod.fts.at/api/v1/sht/articles/${productId}/media/${imageId}`;
-    const filePath = `${productId}/${imageId}.jpg`;
     await makeProductDirectory(filePath);
     const destination = path.resolve("../deduper/images", filePath);
     const fileStream = createWriteStream(destination, { flags: "wx" });
+    fileStream.on("error", () => {
+      console.error(
+        `[Error]: Path ${destination} exists, an error was thrown but it is being silently ignored`
+      );
+      fileStream.emit("finish");
+    });
+
     const res = await fetch(url);
     if (
       res.headers.has("Content-Type") &&
